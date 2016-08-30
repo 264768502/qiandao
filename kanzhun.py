@@ -11,11 +11,14 @@ class temp_logger(object):
         self.filepath = filepath
 
     def logprint(self, str):
-        timestamp = datetime.strftime(datetime.now(), self.timestamp_format)[:-3]
-        print("%s %s"%(timestamp, str))
-        if self.filepath != None:
-            with open(self.filepath, 'a') as f:
-                f.write("%s %s\n"%(timestamp, str))
+        try:
+            timestamp = datetime.strftime(datetime.now(), self.timestamp_format)[:-3]
+            print(u"%s %s"%(timestamp, str))
+            if self.filepath != None:
+                with open(self.filepath, 'a') as f:
+                    f.write(u"%s %s\n"%(timestamp, str))
+        except:
+            pass
 
 
 class kanzhun(object):
@@ -46,24 +49,24 @@ class kanzhun(object):
         res1 = self.kanzhun.get(url_checkaccountbind, params={'account': self.account}, headers=self.common_headers)
         try:
             if res1.json()['rescode'] != 1:
-                self.logger.logprint("Pre1 Login Fail: {0}".format(res1.json()))
+                self.logger.logprint(u"Pre1 Login Fail: {0}".format(res1.json()))
                 return False
         except ValueError:
-            self.logger.logprint("Pre1 Login Fail: Fail to get JSON response")
+            self.logger.logprint(u"Pre1 Login Fail: Fail to get JSON response")
             return False
-        self.logger.logprint("Pre1 Login Check Success")
+        self.logger.logprint(u"Pre1 Login Check Success")
 
         # Pre2 Login, check need captcha
         res2 = self.kanzhun.get(url_needcaptcha, params={'account': self.account}, headers=self.common_headers)
         try:
             if res2.json()['rescode'] != 1:
-                self.logger.logprint("Pre2 Login Fail: {0}".format(res2.json()))
-                self.logger.logprint("Maybe need captcha")
+                self.logger.logprint(u"Pre2 Login Fail: {0}".format(res2.json()))
+                self.logger.logprint(u"Maybe need captcha")
                 return False
         except ValueError:
-            self.logger.logprint("Pre2 Login Fail: Fail to get JSON response")
+            self.logger.logprint(u"Pre2 Login Fail: Fail to get JSON response")
             return False
-        self.logger.logprint("Pre2 Login Check Success")
+        self.logger.logprint(u"Pre2 Login Check Success")
 
         # Login
         logindata = {
@@ -75,13 +78,13 @@ class kanzhun(object):
         res3 = self.kanzhun.post(url_login, data=logindata, headers=self.common_headers)
         try:
             if res3.json()['rescode'] != 1:
-                self.logger.logprint("Login Fail: {0}".format(res3.json()))
+                self.logger.logprint(u"Login Fail: {0}".format(res3.json()))
                 return False
         except ValueError:
-            self.logger.logprint("Login Fail: Fail to get JSON response")
+            self.logger.logprint(u"Login Fail: Fail to get JSON response")
             return False
 
-        self.logger.logprint("Login Success")
+        self.logger.logprint(u"Login Success")
         return True
 
     def sign(self):
@@ -89,27 +92,27 @@ class kanzhun(object):
         res = self.kanzhun.get(url_sign, headers=self.common_headers)
         try:
             if res.json()['rescode'] == 1:
-                self.logger.logprint("Sign Success, Get: {0}".format(res.json()['integral']))
+                self.logger.logprint(u"Sign Success, Get: {0}".format(res.json()['integral']))
                 return True
             else:
-                self.logger.logprint("Sign Fail: {0}".format(res.json()))
+                self.logger.logprint(u"Sign Fail: {0}".format(res.json()))
                 return False
         except ValueError:
-            self.logger.logprint("Sign Fail: Fail to get JSON response")
+            self.logger.logprint(u"Sign Fail: Fail to get JSON response")
             return False
 
     def getsignpoint(self):
         url_my = 'http://www.kanzhun.com/usercenter/account/'
         res = self.kanzhun.get(url_my, headers=self.common_headers)
         if res.status_code != 200:
-            self.logger.logprint("Get Sign Point Fail: Fail to get proper response. {0}".format(res.status_code))
+            self.logger.logprint(u"Get Sign Point Fail: Fail to get proper response. {0}".format(res.status_code))
             return False
         re_point = re.compile(r'integral-number">(\d{1,5})')
         try:
-            self.logger.logprint("Get Sign Point Success: {}".format(re_point.search(res.content).group(1)))
+            self.logger.logprint(u"Get Sign Point Success: {}".format(re_point.search(res.content).group(1)))
             return True
         except AttributeError:
-            self.logger.logprint("Get Sign Point Fail: Fail to find Point RE")
+            self.logger.logprint(u"Get Sign Point Fail: Fail to find Point RE")
             return False
 
 
